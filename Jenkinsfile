@@ -1,35 +1,26 @@
 pipeline {
     agent any
-    triggers {
-  cron 'H/5 * * * *'
-}
-
     tools{
-        maven 'maven-3.8.7'
+        maven 'maven-3.6.3'
     }
-    options {
-  buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '2')
-}
-
 
     stages {
-        stage('Clone the repository') {
+        stage('GIT Clone') {
             steps {
-               git credentialsId: 'Github_username_password', url: 'https://github.com/sandeepkumarmekapothula/Build-and-Push-to-artifactory.git'
+            git credentialsId: 'Github_username_password', url: 'https://github.com/sandeepkumarmekapothula/Build-and-Deploy-to-Tomcat.git'
             }
         }
 
-
-        stage('Build the maven code') {
+        stage('MAVEN Build') {
             steps {
             sh 'mvn clean install'
-                 }
-    }
+            }
+        }
 
-stage('Deploy to tomcat') {
+        stage('Deploy to Tomcat') {
             steps {
-            deploy adapters: [tomcat9(credentialsId: 'Tomcat_Username_password', path: '', url: 'http://15.207.117.35:8080')], contextPath: null, war: '**/*.war'
+            deploy adapters: [tomcat9(credentialsId: 'tomcat-cred', path: '', url: 'http://35.166.236.112:8081')], contextPath: null, war: '**/*.war'
                  }
+        }
     }
-}
 }
